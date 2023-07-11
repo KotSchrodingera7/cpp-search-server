@@ -332,7 +332,7 @@ void TestMatchedWithMinusWord()
     }
 }
 
-void TestReleanceTopDocument()
+void TestRelevanceTopDocument()
 {
     const int doc_id1 = 42;
     const string content1 = "cat in the city"s;
@@ -358,7 +358,7 @@ void TestReleanceTopDocument()
     }
 }
 
-void TestRatingDdpcuments()
+void TestRatingDocuments()
 {
     const int doc_id1 = 42;
     const string content1 = "cat in the city"s;
@@ -385,7 +385,7 @@ void TestRatingDdpcuments()
     }
 }
 
-void TestPredicat()
+void TestPredicate()
 {
     const int doc_id1 = 42;
     const string content1 = "cat in the city"s;
