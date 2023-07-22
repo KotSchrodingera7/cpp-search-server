@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <numeric>
 
 using namespace std;
 
@@ -91,24 +92,27 @@ public:
 
     explicit SearchServer(const string& stop_words_text) 
             : SearchServer(SplitIntoWords(stop_words_text)) {
-        if( !IsValidWord(stop_words_text) ) {
-            throw invalid_argument("Stop words have wrong symbol");
-        }
     }
 
     inline static constexpr int INVALID_DOCUMENT_ID = -1;
 
     void AddDocument(int document_id, const string& document, DocumentStatus status,
                      const vector<int>& ratings) {
-        if( document_id < 0 || documents_.count(document_id) || !IsValidWord(document) ) {
-            throw invalid_argument("Wrong values of document");
+        if( document_id < 0 ) {
+            throw invalid_argument("Document id < 0");
         }
+
+        if( documents_.count(document_id)) {
+            throw invalid_argument("Document with id is exist");
+        }
+
         const vector<string> words = SplitIntoWordsNoStop(document);
         const double inv_word_count = 1.0 / words.size();
         for (const string& word : words) {
             word_to_document_freqs_[word][document_id] += inv_word_count;
         }
         documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
+        documents_id_.push_back(document_id);
     }
 
     template <typename DocumentPredicate>
@@ -122,7 +126,7 @@ public:
 
         sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
-                 if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+                 if (abs(lhs.relevance - rhs.relevance) < numeric_limits<double>::epsilon() ) {
                      return lhs.rating > rhs.rating;
                  } else {
                      return lhs.relevance > rhs.relevance;
@@ -150,13 +154,8 @@ public:
     }
 
     int GetDocumentId(int index) const {
-        if( index < 0 || index > documents_.size() )
-        {
-            throw out_of_range("Index isn't to range");
-        }
-        auto itAtOffset = std::next(documents_.begin(), index);
 
-        return itAtOffset->first;
+        return documents_id_.at(index);
     }
 
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, 
@@ -202,6 +201,7 @@ private:
     const set<string> stop_words_;
     map<string, map<int, double>> word_to_document_freqs_;
     map<int, DocumentData> documents_;
+    vector<int> documents_id_;
 
     bool IsStopWord(const string& word) const {
         return stop_words_.count(word) > 0;
@@ -210,6 +210,9 @@ private:
     vector<string> SplitIntoWordsNoStop(const string& text) const {
         vector<string> words;
         for (const string& word : SplitIntoWords(text)) {
+            if( !IsValidWord(word) ) {
+                throw invalid_argument("Word have a wrong symbol");
+            }
             if (!IsStopWord(word)) {
                 words.push_back(word);
             }
@@ -221,10 +224,7 @@ private:
         if (ratings.empty()) {
             return 0;
         }
-        int rating_sum = 0;
-        for (const int rating : ratings) {
-            rating_sum += rating;
-        }
+        int rating_sum = accumulate(ratings.begin(), ratings.end(), 0);
         return rating_sum / static_cast<int>(ratings.size());
     }
 
@@ -340,9 +340,9 @@ void PrintDocument(const Document& document) {
 int main() {
     try {
         // SearchServer search_server(std::vector<string>{"и", "\x12в", "на"});
-        SearchServer search_server("и \x12в на"s);
+        SearchServer search_server("и в на"s);
 
-        search_server.AddDocument(0, "белый кот и модный ошейник"s, DocumentStatus::ACTUAL, {8, -3});
+        search_server.AddDocument(0, "белый кот и \x12модный ошейник"s, DocumentStatus::ACTUAL, {8, -3});
         search_server.AddDocument(1, "пушистый кот пушистый хвост"s, DocumentStatus::ACTUAL, {7, 2, 7});
         search_server.AddDocument(2, "ухоженный пёс выразительные глаза"s, DocumentStatus::ACTUAL,
                               {5, -12, 2, 1});
