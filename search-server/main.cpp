@@ -94,8 +94,6 @@ public:
             : SearchServer(SplitIntoWords(stop_words_text)) {
     }
 
-    inline static constexpr int INVALID_DOCUMENT_ID = -1;
-
     void AddDocument(int document_id, const string& document, DocumentStatus status,
                      const vector<int>& ratings) {
         if( document_id < 0 ) {
