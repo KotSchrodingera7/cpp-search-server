@@ -1,6 +1,7 @@
 //Вставьте сюда своё решение из урока «Очередь запросов» темы «Стек, очередь, дек».‎
 #include "search_server.h"
 #include <cmath>
+#include <numeric>
 
 using namespace std::literals;
 
@@ -92,10 +93,7 @@ int SearchServer::ComputeAverageRating(const std::vector<int>& ratings) {
     if (ratings.empty()) {
         return 0;
     }
-    int rating_sum = 0;
-    for (const int rating : ratings) {
-        rating_sum += rating;
-    }
+    int rating_sum = std::accumulate(ratings.begin(), ratings.end(), 0);
     return rating_sum / static_cast<int>(ratings.size());
 }
 SearchServer::QueryWord SearchServer::ParseQueryWord(const std::string& text) const {

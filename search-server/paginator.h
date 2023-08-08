@@ -28,11 +28,11 @@ template<typename Iterator>
 class Paginator {
 public:
     Paginator(Iterator begin, Iterator end, int size) {
-        auto n = distance(begin, end);
+        auto range = distance(begin, end);
         auto start_it = begin;
-        while( n > size ) {
+        while( range > size ) {
             range_.push_back({start_it, start_it + size});
-            n -= size;
+            range -= size;
             start_it += size;   
         }
         range_.push_back({start_it, end});
@@ -52,15 +52,6 @@ private:
 template <typename Container>
 auto Paginate(const Container& c, size_t page_size) {
     return Paginator(begin(c), end(c), page_size);
-}
-
-std::ostream& operator<<(std::ostream &out, const Document &document) {
-    using namespace std::literals;
-    out << "{ "s
-         << "document_id = "s << document.id << ", "s
-         << "relevance = "s << document.relevance << ", "s
-         << "rating = "s << document.rating << " }"s;
-    return out;
 }
 
 template<typename Iterator>
