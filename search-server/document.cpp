@@ -2,8 +2,7 @@
 
 #include "document.h"
 
-
-std::ostream& operator<<(std::ostream &out, const Document &document) {
+std::ostream& operator<<(std::ostream &out, Document document) {
     using namespace std::literals;
     out << "{ "s
          << "document_id = "s << document.id << ", "s

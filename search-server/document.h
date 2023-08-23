@@ -1,8 +1,7 @@
 #pragma once
 //Вставьте сюда своё решение из урока «Очередь запросов» темы «Стек, очередь, дек».‎
-
-
 #include <iostream>
+
 enum class DocumentStatus {
     ACTUAL,
     IRRELEVANT,
@@ -23,3 +22,5 @@ struct Document {
     double relevance = 0.0;
     int rating = 0;
 };
+
+std::ostream& operator<<(std::ostream& output, Document document);
