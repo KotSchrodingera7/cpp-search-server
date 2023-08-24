@@ -26,9 +26,7 @@ void SearchServer::RemoveDocument(int document_id) {
     documents_.erase(document_id);
     document_ids_.erase(document_id);
 
-    auto map_words = document_id_freq_word.at(document_id);
-
-    for(const auto &[word, inv]: map_words ) {
+    for(const auto &[word, inv]: document_id_freq_word.at(document_id) ) {
         word_to_document_freqs_.at(word).erase(document_id);
     }
 
@@ -48,7 +46,11 @@ std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_quer
 }
 
 const std::map<std::string, double>& SearchServer::GetWordFrequencies(int document_id) const {
-    return document_id_freq_word.at(document_id);
+    static std::map<std::string, double> result;
+    if( document_id_freq_word.count(document_id) ) {
+        result = document_id_freq_word.at(document_id);
+    }
+    return result;
 }
 
 int SearchServer::GetDocumentCount() const {

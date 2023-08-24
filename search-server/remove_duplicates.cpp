@@ -2,37 +2,30 @@
 #include "remove_duplicates.h"
 
 #include <set>
+
 void RemoveDuplicates(SearchServer& search_server) {
 
     std::set<int> duplicates_;
 
-    for( auto it = search_server.begin(); it != search_server.end(); ++it ) {
-        auto words_first = search_server.GetWordFrequencies(*it);
+    std::set<std::vector<std::string>> words;
 
-        for( auto next_it = std::next(it); next_it != search_server.end(); ++next_it ) {
-            auto words_second = search_server.GetWordFrequencies(*next_it);
-
-            if( words_first.size() != words_second.size() ) {
-                continue;
-            }
-
-            auto it_word_second = words_second.begin();
-
-            for( auto it_word_first = words_first.begin(); it_word_first != words_first.end(); ++it_word_first) {
-
-                if( (*it_word_first).first != (*it_word_second).first ) {
-                    break;
-                }
-                ++it_word_second;
-            }
-
-            if( it_word_second == words_second.end() ) {
-                duplicates_.insert(*next_it);
-            }
+    for( const int id : search_server ) {
+        auto words_server = search_server.GetWordFrequencies(id);
+        
+        std::vector<std::string> data_;
+        for( const auto &[word, rel] : words_server ) {
+            data_.push_back(word);
         }
+
+        if( words.count(data_) ) {
+            duplicates_.insert(id);
+            continue;
+        }
+
+        words.insert(data_);
     }
 
-    for(auto const &id : duplicates_) {
+    for( const int id : duplicates_ ) {
         std::cout << "Found duplicate document id " << id << std::endl;
         search_server.RemoveDocument(id);
     }
