@@ -7,12 +7,12 @@ void RemoveDuplicates(SearchServer& search_server) {
 
     std::set<int> duplicates_;
 
-    std::set<std::vector<std::string>> words;
+    std::set<std::vector<std::string_view>> words;
 
     for( const int id : search_server ) {
         auto words_server = search_server.GetWordFrequencies(id);
         
-        std::vector<std::string> data_;
+        std::vector<std::string_view> data_;
         for( const auto &[word, rel] : words_server ) {
             data_.push_back(word);
         }

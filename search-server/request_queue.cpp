@@ -4,7 +4,7 @@
 
 std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query, DocumentStatus status) {
     // напишите реализацию
-    auto data_ = server_.FindTopDocuments(raw_query, status);
+    auto data_ = server_.FindTopDocuments(std::execution::seq, raw_query, status);
     AddRequest(data_, raw_query);
     return data_;
 }
